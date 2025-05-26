@@ -77,7 +77,10 @@ app.post('/api/logout', (req, res) => {
 });
 
 // Google OAuth routes
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google', (req, res, next) => {
+    req.session.returnTo = process.env.CLIENT_URL || 'http://localhost:5173';
+    next();
+}, passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 function successReturnToOrRedirect(defaultRedirect) {
     return (req, res) => {
@@ -95,7 +98,10 @@ app.get('/auth/google/callback',
 );
 
 // Kakao OAuth routes
-app.get('/auth/kakao', passport.authenticate('kakao'));
+app.get('/auth/kakao', (req, res, next) => {
+    req.session.returnTo = process.env.CLIENT_URL || 'http://localhost:5173';
+    next();
+}, passport.authenticate('kakao'));
 
 app.get('/auth/kakao/callback',
     passport.authenticate('kakao', {
