@@ -98,12 +98,12 @@ app.get('/auth/google/callback',
 );
 
 // Kakao OAuth routes
-app.get('/auth/kakao', (req, res, next) => {
+app.get(`/auth/kakao`, (req, res, next) => {
     req.session.returnTo = process.env.CLIENT_URL || 'http://localhost:5173';
     next();
 }, passport.authenticate('kakao'));
 
-app.get('/auth/kakao/callback',
+app.get(`/auth/kakao/callback`,
     passport.authenticate('kakao', {
         failureRedirect: '/login',
     }),

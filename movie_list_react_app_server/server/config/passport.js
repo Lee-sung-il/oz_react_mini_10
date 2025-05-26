@@ -26,7 +26,7 @@ passport.use(new LocalStrategy(
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/auth/google/callback',
+  callbackURL: process.env.GOOGLE_CALLBACK_URL,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     const existingUser = await User.findOne({ googleId: profile.id });
@@ -46,7 +46,7 @@ passport.use(new GoogleStrategy({
 
 passport.use(new KakaoStrategy({
   clientID: process.env.KAKAO_CLIENT_ID,
-  callbackURL: '/auth/kakao/callback',
+  callbackURL: process.env.KAKAO_CALLBACK_URL,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     const existingUser = await User.findOne({ kakaoId: profile.id });
