@@ -16,7 +16,7 @@ export default function MovieDetail({ isDarkMode }: { isDarkMode: boolean }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        api.get('api/current-user', { credentials: 'include' })
+        api.get('api/current-user')
             .then(async (res) => {
                 if (!res.ok) {
                     setUser(null);
