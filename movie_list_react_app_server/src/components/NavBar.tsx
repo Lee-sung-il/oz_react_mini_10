@@ -10,10 +10,13 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
   const { user, setUser } = useUser();
   const navigate = useNavigate();
   const debouncedSearch = useDebounce(search, 500);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const location = useLocation();
 
-  const userName = user?.email?.split('@')[0] || '';
+  type UserWithName = { name: string; email: string };
+  const typedUser = user as UserWithName | null;
+  const userName = typedUser?.name || '';
 
   // Fetch current user on mount
   useEffect(() => {
@@ -46,6 +49,7 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
       });
       if (response.ok) {
         setUser(null);
+        setShowDropdown(false);
         navigate('/');
       }
     } catch (error) {
@@ -65,7 +69,7 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
   }, [debouncedSearch]);
 
   return (
-    <nav className={`p-4 shadow-md ${isDarkMode ? 'bg-gray-300 text-black' : 'bg-gray-900 text-white'}`}>
+    <nav className={`relative z-50 p-4 shadow-md ${isDarkMode ? 'bg-gray-300 text-black' : 'bg-gray-900 text-white'}`}>
         <div className="container mx-auto flex items-center justify-between">
           {/* 로고 */}
           <div className="text-xl font-bold">
@@ -98,11 +102,31 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
           {/* 링크 (데스크탑용) */}
           <div className="hidden lg:flex space-x-4 items-center">
             <Link to="/" className="hover:text-yellow-400">Home</Link>
-            {user ? (
-              <>
-                <span>{userName && `${userName}님`}</span>
-                <button onClick={logout} className="hover:text-yellow-400">로그아웃</button>
-              </>
+            {typedUser ? (
+              <div className="relative">
+                <div
+                  onClick={() => setShowDropdown((prev) => !prev)}
+                  className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 1115 0v.75H4.5v-.75z" />
+                  </svg>
+                </div>
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-32 bg-white text-black shadow-lg rounded-md">
+                    <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">마이 페이지</button>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setShowDropdown(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      로그아웃
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <button onClick={goToLogin} className="block hover:text-yellow-400">로그인</button>
@@ -134,16 +158,27 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
             />
             <div className="space-y-2">
               <Link to="/" className="block hover:text-yellow-400">Home</Link>
-              {user ? (
-                <div>
-                  <span>{userName && `${userName}님`}</span>
-                  <button onClick={logout} className="hover:text-yellow-400">로그아웃</button>
+              {typedUser ? (
+                <div className="flex flex-col items-center space-y-1">
+                  <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center">
+                    {userName.charAt(0).toUpperCase()}
+                  </div>
+                  <button className="hover:text-yellow-400">마이 페이지</button>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setShowDropdown(false);
+                    }}
+                    className="hover:text-yellow-400"
+                  >
+                    로그아웃
+                  </button>
                 </div>
               ) : (
-                <>
-                  <button onClick={goToLogin} className="block hover:text-yellow-400">로그인</button>
+                <div className="flex flex-col items-center space-y-1">
+                  <button onClick={goToLogin} className="hover:text-yellow-400">로그인</button>
                   <button onClick={goToRegister} className="hover:text-yellow-400">회원가입</button>
-                </>
+                </div>
               )}
             </div>
             <button

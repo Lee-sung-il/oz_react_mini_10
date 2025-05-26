@@ -1,5 +1,22 @@
 import ky from "ky";
 
+// 유틸 함수
+function isAllowedMovie(movie: RawMovie): boolean {
+    return !movie.adult &&
+        !/(19금|19세|19|청불|청소년관람불가|R등급|18\+|porn|sex|sexual|erotic|nude|xxx|adult|섹스|야함|노출|선정)/i.test(
+            movie.title + " " + movie.overview
+        );
+}
+
+function toMovie(movie: RawMovie): Movie {
+    return {
+        id: movie.id,
+        title: movie.title,
+        rating: movie.vote_average,
+        poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+    };
+}
+
 // TMDB API 응답 원형
 type RawMovie = {
     id: number;
@@ -44,29 +61,18 @@ const api = ky.create({
     },
 });
 
-// TMDB 인기 영화 가져오기
-export async function fetchMovies(): Promise<Movie[]> {
+// TMDB 인기 영화 가져오기 (페이지네이션 지원)
+export async function fetchMovies(page: number): Promise<Movie[]> {
     const data = await api
         .get("movie/popular", {
             searchParams: {
                 language: "ko-KR",
-                page: "1",
+                page: page.toString(),
             },
         })
         .json<ApiResponse>();
 
-    return data.results
-        .filter(
-            (movie) =>
-                !movie.adult &&
-                !/(19금|19세|19|청불|청소년관람불가|R등급|18\+|porn|sex|sexual|erotic|nude|xxx|adult|섹스|야함|노출|선정)/i.test(movie.title + " " + movie.overview)
-        )
-        .map((movie) => ({
-            id: movie.id,
-            title: movie.title,
-            rating: movie.vote_average,
-            poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-        }));
+    return data.results.filter(isAllowedMovie).map(toMovie);
 }
 
 export async function fetchMovieDetail(movieId: string): Promise<MovieDetail> {
@@ -102,16 +108,5 @@ export async function searchMovies(query: string): Promise<Movie[]> {
         })
         .json<ApiResponse>();
 
-    return data.results
-        .filter(
-            (movie) =>
-                !movie.adult &&
-                !/(19금|19세|19|청불|청소년관람불가|R등급|18\+|porn|sex|sexual|erotic|nude|xxx|adult|섹스|야함|노출|선정)/i.test(movie.title + " " + movie.overview)
-        )
-        .map((movie) => ({
-            id: movie.id,
-            title: movie.title,
-            rating: movie.vote_average,
-            poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-        }));
+    return data.results.filter(isAllowedMovie).map(toMovie);
 }

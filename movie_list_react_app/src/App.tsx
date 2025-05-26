@@ -1,12 +1,13 @@
-import { useState} from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from './supabase/client';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
-import MovieList from './components/MovieList';
-import MovieDetail from './components/MovieDetail';
 import SearchPreview from './components/SearchPreview';
 import {Layout} from "./components/Layout.tsx";
 import RegisterPage from "./User/RegisterPage.tsx";
 import LoginPage from "./User/LoginPage.tsx";
-import {UserContext} from "./context/UserContext.tsx"; // new layout with NavBar
+import {UserContext} from "./context/UserContext.tsx";
+import MovieList from "./components/MovieList.tsx";
+import MovieDetail from "./components/MovieDetail.tsx"; // new layout with NavBar
 
 function App() {
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -23,6 +24,15 @@ function App() {
         });
     };
 
+    useEffect(() => {
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            if (user) {
+                setUser({ email: user.email! });
+            }
+        });
+    }, []);
+
+
 
     return (
         <div>
@@ -34,7 +44,7 @@ function App() {
                         <Route path="/details/:movieId" element={<MovieDetail isDarkMode={isDarkMode}/>}/>
                         <Route path="/search" element={<SearchPreview isDarkMode={isDarkMode}/>}/>
                         <Route path="/register" element={<RegisterPage isDarkMode={isDarkMode}/>}/>
-                        <Route path="/login" element={<LoginPage isDarkMode={isDarkMode} />} />  {/* ✅ 이거 추가 */}
+                        <Route path="/login" element={<LoginPage isDarkMode={isDarkMode} />} />
                     </Route>
                 </Routes>
             </Router>

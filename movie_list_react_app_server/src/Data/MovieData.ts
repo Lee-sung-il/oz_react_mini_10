@@ -61,13 +61,13 @@ const api = ky.create({
     },
 });
 
-// TMDB 인기 영화 가져오기
-export async function fetchMovies(): Promise<Movie[]> {
+// TMDB 인기 영화 가져오기 (페이지네이션 지원)
+export async function fetchMovies(page: number): Promise<Movie[]> {
     const data = await api
         .get("movie/popular", {
             searchParams: {
                 language: "ko-KR",
-                page: "1",
+                page: page.toString(),
             },
         })
         .json<ApiResponse>();

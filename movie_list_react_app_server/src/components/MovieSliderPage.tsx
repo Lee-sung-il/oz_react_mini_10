@@ -1,11 +1,12 @@
 import {Swiper, SwiperSlide} from 'swiper/react';
-import {Navigation, Autoplay} from 'swiper/modules';
+import {Navigation, Autoplay, EffectCoverflow} from 'swiper/modules';
 import {useEffect, useState} from "react";
 
-// @ts-ignore
+
+
 import 'swiper/css';
-// @ts-ignore
 import 'swiper/css/navigation';
+import "swiper/css/effect-coverflow";
 import {fetchMovies} from "../Data/MovieData.ts";
 import {Link} from "react-router-dom";
 import {LoadingPage} from "../Loading/LoadingPage.tsx";
@@ -23,7 +24,7 @@ export default function MovieSliderPage({ isDarkMode }: { isDarkMode: boolean })
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchMovies()
+        fetchMovies(1)
             .then(setMovieSlider)
             .catch(console.error)
             .finally(() => setLoading(false));
@@ -37,11 +38,16 @@ export default function MovieSliderPage({ isDarkMode }: { isDarkMode: boolean })
         <>
 
             <div className={`w-screen h-screen flex flex-col overflow-auto ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
-                <div className="flex-1 flex items-center m-0 p-0">
+                <div className="flex-1 flex items-center justify-center p-4">
                     <Swiper
-                        modules={[Navigation, Autoplay]}
+                        modules={[Navigation, Autoplay, EffectCoverflow]}
                         spaceBetween={40}
-                        slidesPerView={1}
+                        slidesPerView={3}
+                        breakpoints={{
+                          0: { slidesPerView: 1 },
+                          768: { slidesPerView: 2 },
+                          1024: { slidesPerView: 3 },
+                        }}
                         autoplay={{ delay: 3000, disableOnInteraction: false }}
                         pagination={false}
                         className="w-full h-full flex-1 relative"
@@ -49,15 +55,25 @@ export default function MovieSliderPage({ isDarkMode }: { isDarkMode: boolean })
                             nextEl: '.swiper-button-next',
                             prevEl: '.swiper-button-prev',
                         }}
+                        effect="coverflow"
+                        centeredSlides={true}
+                        loop={true}
+                        coverflowEffect={{
+                          rotate: 50,
+                          stretch: 0,
+                          depth: 100,
+                          modifier: 1,
+                          slideShadows: false,
+                        }}
                     >
                         {movieSlider.map((movie) => (
-                            <SwiperSlide key={movie.id} className="h-full flex justify-center items-center px-4">
+                            <SwiperSlide key={movie.id} className="w-full flex justify-center items-center">
                                 <div className="flex flex-col justify-center items-center text-center">
                                     <Link to={`/details/${movie.id}`}>
                                     <img
                                         src={movie.poster}
                                         alt={movie.title}
-                                        className="w-full h-[70vh] object-cover mb-2"
+                                        className="w-[98vw] md:w-[80%] lg:w-[70%] h-auto max-h-[65vh] object-contain mb-2"
                                     />
                                     </Link>
                                 </div>

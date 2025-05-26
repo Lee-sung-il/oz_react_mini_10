@@ -19,7 +19,10 @@ export default function MovieDetail({ isDarkMode }: { isDarkMode: boolean }) {
             .then(async (res) => {
                 if (!res.ok) {
                     setUser(null);
-                    navigate('/login', { state: { from: location.pathname } });
+                    const publicPaths = ['/', '/login', '/register'];
+                    if (!publicPaths.includes(location.pathname)) {
+                        navigate('/login', { state: { from: location.pathname } });
+                    }
                 } else {
                     const data = await res.json();
                     setUser(data.user);
@@ -27,7 +30,10 @@ export default function MovieDetail({ isDarkMode }: { isDarkMode: boolean }) {
             })
             .catch(() => {
                 setUser(null);
-                navigate('/login', { state: { from: location.pathname } });
+                const publicPaths = ['/', '/login', '/register'];
+                if (!publicPaths.includes(location.pathname)) {
+                    navigate('/login', { state: { from: location.pathname } });
+                }
             });
     }, [navigate, location.pathname]);
 
@@ -51,7 +57,7 @@ export default function MovieDetail({ isDarkMode }: { isDarkMode: boolean }) {
     if (!movie) return <div>영화 정보를 불러올 수 없습니다.</div>;
 
     return (
-        <div className={`flex justify-center items-center min-h-screen px-4 py-16 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} ${!isDarkMode ? 'text-black' : ''}`}>
+        <div className={`flex justify-center items-center min-h-screen px-4 py-16 z-20 relative ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} ${!isDarkMode ? 'text-black' : ''}`}>
             <div className="max-w-4xl w-full p-8 flex flex-col md:flex-row gap-10 items-start md:items-center">
                 <img
                     src={movie.poster}

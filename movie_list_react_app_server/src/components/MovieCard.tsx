@@ -9,7 +9,7 @@ export default function MovieCard({ id, title, poster, rating, isDarkMode }: {
 }) {
     return (
         <Link to={`/details/${id}`}>
-            <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} shadow-md rounded-lg overflow-hidden hover:scale-105 transition p-2`}>
+            <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'} shadow-md rounded-lg overflow-hidden hover:scale-105 transition p-2 z-10`}>
                 <div className="flex justify-center items-center h-96">
                     <img
                         src={poster}

@@ -1,3 +1,4 @@
+import { supabase } from '../supabase/client';
 import { useState, useEffect } from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -10,23 +11,27 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
   const { user, setUser } = useUser();
   const navigate = useNavigate();
   const debouncedSearch = useDebounce(search, 500);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const location = useLocation();
 
   const userName = user?.email?.split('@')[0] || '';
 
-  // Fetch current user on mount
+  // Fetch current user on mount and listen to auth state changes (Supabase)
   useEffect(() => {
-    fetch('/api/current-user', { credentials: 'include' })
-      .then(async res => {
-        if (!res.ok) throw new Error('Unauthorized');
-        const data = await res.json();
-        console.log('User loaded:', data.user);
-        setUser(data.user);
-      })
-      .catch(() => {
-        setUser(null);
-      });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      setUser(user?.email ? { email: user.email } : null);
+    });
+
+    // 초기 유저 상태 로드
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user?.email ? { email: user.email } : null);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   const goToRegister = () => {
@@ -39,17 +44,12 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
   };
 
   const logout = async () => {
-    try {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-      if (response.ok) {
-        setUser(null);
-        navigate('/');
-      }
-    } catch (error) {
-      console.error('Logout failed:', error);
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      setUser(null);
+      navigate('/');
+    } else {
+      console.error('Logout failed:', error.message);
     }
   };
 
@@ -65,7 +65,7 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
   }, [debouncedSearch]);
 
   return (
-    <nav className={`p-4 shadow-md ${isDarkMode ? 'bg-gray-300 text-black' : 'bg-gray-900 text-white'}`}>
+    <nav className={`relative z-50 p-4 shadow-md ${isDarkMode ? 'bg-gray-300 text-black' : 'bg-gray-900 text-white'}`}>
         <div className="container mx-auto flex items-center justify-between">
           {/* 로고 */}
           <div className="text-xl font-bold">
@@ -99,10 +99,28 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
           <div className="hidden lg:flex space-x-4 items-center">
             <Link to="/" className="hover:text-yellow-400">Home</Link>
             {user ? (
-              <>
-                <span>{userName && `${userName}님`}</span>
-                <button onClick={logout} className="hover:text-yellow-400">로그아웃</button>
-              </>
+              <div className="relative z-50 p-4">
+                <div
+                  onClick={() => setShowDropdown((prev) => !prev)}
+                  className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center cursor-pointer"
+                >
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-32 bg-white text-black shadow-lg rounded-md">
+                    <button className="block w-full text-left px-4 py-2 hover:bg-gray-100">마이 페이지</button>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setShowDropdown(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      로그아웃
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <button onClick={goToLogin} className="block hover:text-yellow-400">로그인</button>
