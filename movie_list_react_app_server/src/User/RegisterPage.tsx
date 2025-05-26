@@ -73,15 +73,15 @@ export default function RegisterPage({ isDarkMode }: { isDarkMode: boolean }) {
         if (Object.values(newErrors).some((msg) => msg)) return;
 
         try {
-            await api.post('api/register', {
+            await api.post('/api/register', {
                 json: { name, email, password },
             });
             // Fetch current user after successful registration and update context
-            const response = await api.get('api/current-user').json();
+            const response = await api.get('/api/current-user').json();
             interface User {
                 id: string;
+                name: string;
                 email: string;
-                // Add other fields as needed from your backend
             }
             const user = (response as { user: User }).user;
             setUser(user);

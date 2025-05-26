@@ -17,6 +17,7 @@ export default function LoginPage({ isDarkMode }: { isDarkMode: boolean }) {
   const state = location.state as LocationState;
   const from = state?.from || '/';
 
+  // Ensure user object includes both name and email
   const { setUser } = useUser();
 
 
@@ -34,12 +35,12 @@ export default function LoginPage({ isDarkMode }: { isDarkMode: boolean }) {
       return;
     }
     try {
-      await api.post('/api/login', {
+      await api.post('api/login', {
         json: { email, password },
         credentials: 'include',
       });
-      const { user } = await api.get('/api/current-user', { credentials: 'include' }).json<{ user: { name: string; email: string } }>();
-      setUser(user);
+      const { user } = await api.get('api/current-user', { credentials: 'include' }).json<{ user: { name: string; email: string } }>();
+      setUser({ name: user.name, email: user.email });
       setError('');
       navigate(from, { replace: true });
     } catch (err) {

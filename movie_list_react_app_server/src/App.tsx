@@ -14,7 +14,7 @@ function App() {
         return saved === "true";
     });
 
-    const [user, setUser] = useState<{ email: string } | null>(null);
+    const [user, setUser] = useState<{ email: string; name: string } | null>(null);
     const toggleDarkMode = () => {
         setIsDarkMode(prev => {
             const newValue = !prev;

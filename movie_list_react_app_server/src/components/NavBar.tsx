@@ -43,7 +43,7 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
 
   const logout = async () => {
     try {
-      const response = await api.post('api/logout');
+      const response = await api.post('/api/logout');
       if (response.ok) {
         setUser(null);
         setShowDropdown(false);

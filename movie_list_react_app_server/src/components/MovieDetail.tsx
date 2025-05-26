@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
+import api from '../context/api';
 import { fetchMovieDetail } from '../Data/MovieData';
 import type { MovieDetail } from '../Data/MovieData';
 import {TypeAnimation} from "react-type-animation";
@@ -15,7 +16,7 @@ export default function MovieDetail({ isDarkMode }: { isDarkMode: boolean }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('/api/current-user', { credentials: 'include' })
+        api.get('/api/current-user', { credentials: 'include' })
             .then(async (res) => {
                 if (!res.ok) {
                     setUser(null);
@@ -43,9 +44,7 @@ export default function MovieDetail({ isDarkMode }: { isDarkMode: boolean }) {
             setLoading(false);
             return;
         }
-        fetchMovieDetail(movieId)
-            .then(setMovie)
-            .finally(() => setLoading(false));
+        fetchMovieDetail(movieId).then(setMovie).catch(() => setMovie(null)).finally(() => setLoading(false));
     }, [movieId, user]);
 
     if (loading) {
