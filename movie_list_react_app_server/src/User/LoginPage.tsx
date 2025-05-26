@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import ky, { HTTPError } from 'ky';
+import api from '../context/api';
+import { HTTPError } from 'ky';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 
@@ -33,11 +34,11 @@ export default function LoginPage({ isDarkMode }: { isDarkMode: boolean }) {
       return;
     }
     try {
-      await ky.post('/api/login', {
+      await api.post('api/login', {
         json: { email, password },
         credentials: 'include',
       });
-      const { user } = await ky.get('/api/current-user', { credentials: 'include' }).json<{ user: { name: string; email: string } }>();
+      const { user } = await api.get('api/current-user', { credentials: 'include' }).json<{ user: { name: string; email: string } }>();
       setUser(user);
       setError('');
       navigate(from, { replace: true });
@@ -111,7 +112,7 @@ export default function LoginPage({ isDarkMode }: { isDarkMode: boolean }) {
           </li>
           <li className="text-center">
             <a
-              href="http://localhost:8080/auth/google"
+              href={`${import.meta.env.VITE_API_URL}/auth/google`}
               className="inline-block w-full bg-white text-black border border-gray-300 px-4 py-2 rounded hover:bg-gray-100"
             >
               Google 계정으로 로그인
@@ -119,7 +120,7 @@ export default function LoginPage({ isDarkMode }: { isDarkMode: boolean }) {
           </li>
           <li className="text-center">
             <a
-              href="http://localhost:8080/auth/kakao"
+              href={`${import.meta.env.VITE_API_URL}/auth/kakao`}
               className="inline-block w-full bg-yellow-400 text-black border border-gray-300 px-4 py-2 rounded hover:bg-yellow-300"
             >
               Kakao 계정으로 로그인

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useUser } from '../context/UserContext';
-import ky, { HTTPError } from 'ky';
+import api from '../context/api'; // ky 인스턴스를 따로 만든 모듈로 대체
 import { useNavigate, useLocation } from 'react-router-dom';
 import * as React from "react";
+import {HTTPError} from "ky";
 
 interface FormInputProps {
   id: string;
@@ -72,12 +73,11 @@ export default function RegisterPage({ isDarkMode }: { isDarkMode: boolean }) {
         if (Object.values(newErrors).some((msg) => msg)) return;
 
         try {
-            await ky.post('/api/register', {
+            await api.post('api/register', {
                 json: { name, email, password },
-                credentials: 'include',
             });
             // Fetch current user after successful registration and update context
-            const response = await ky.get('/api/current-user', { credentials: 'include' }).json();
+            const response = await api.get('api/current-user').json();
             interface User {
                 id: string;
                 email: string;

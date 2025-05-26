@@ -3,6 +3,7 @@ import {Link, useLocation} from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import {useDebounce} from "../hooks/useDebounce.ts";
 import { useUser } from '../context/UserContext';
+import api from '../context/api';
 
 export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boolean; toggleDarkMode: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,10 +21,9 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
 
   // Fetch current user on mount
   useEffect(() => {
-    fetch('/api/current-user', { credentials: 'include' })
-      .then(async res => {
-        if (!res.ok) throw new Error('Unauthorized');
-        const data = await res.json();
+    api.get('api/current-user', { credentials: 'include' })
+      .then(async (res) => {
+        const data: { user: UserWithName } = await res.json();
         console.log('User loaded:', data.user);
         setUser(data.user);
       })
@@ -43,10 +43,7 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
 
   const logout = async () => {
     try {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      const response = await api.post('/api/logout');
       if (response.ok) {
         setUser(null);
         setShowDropdown(false);
