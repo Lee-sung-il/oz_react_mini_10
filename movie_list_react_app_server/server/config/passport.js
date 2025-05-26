@@ -53,7 +53,7 @@ passport.use(new KakaoStrategy({
     if (existingUser) return done(null, existingUser);
 
     const user = new User({
-      name: profile.username || profile.displayName,
+      name: profile.username || profile.displayName || profile.nickname ,
       email: profile._json?.kakao_account?.email || `kakao_${profile.id}@noemail.com`,
       kakaoId: profile.id,
     });
