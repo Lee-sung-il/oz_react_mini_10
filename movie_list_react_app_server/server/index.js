@@ -8,7 +8,7 @@ const User = require('./models/user');
 require('dotenv').config(); // 이 줄이 있어야 .env 파일이 적용됩니다
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const DB_URL = process.env.DB_URL || 'mongodb://localhost:27017/movieUsers';
 
 mongoose.connect(DB_URL)
