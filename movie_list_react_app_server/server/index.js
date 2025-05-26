@@ -16,7 +16,10 @@ mongoose.connect(DB_URL)
     .catch((err) => console.error('❌ MongoDB 연결 실패:', err));
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: [
+        'http://localhost:5173',
+        'https://oz-movie-git-main-lee-sung-ils-projects.vercel.app'
+    ],
     credentials: true
 }));
 app.use(express.json());
@@ -25,7 +28,7 @@ app.use(session({
     secret: 'mySecretKey',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/movieUsers' })
+    store: MongoStore.create({ mongoUrl: DB_URL })
 }));
 
 app.use(passport.initialize());
@@ -83,7 +86,7 @@ app.get('/auth/google/callback',
     passport.authenticate('google', {
         failureRedirect: '/login',
     }),
-    successReturnToOrRedirect('http://localhost:5173')
+    successReturnToOrRedirect('https://oz-movie-git-main-lee-sung-ils-projects.vercel.app')
 );
 
 // Kakao OAuth routes
@@ -93,7 +96,7 @@ app.get('/auth/kakao/callback',
     passport.authenticate('kakao', {
         failureRedirect: '/login',
     }),
-    successReturnToOrRedirect('http://localhost:5173')
+    successReturnToOrRedirect('https://oz-movie-git-main-lee-sung-ils-projects.vercel.app')
 );
 
 app.listen(PORT, () => {
