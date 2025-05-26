@@ -29,7 +29,11 @@ app.use(session({
     secret: 'mySecretKey',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: DB_URL })
+    store: MongoStore.create({ mongoUrl: DB_URL }),
+    cookie: {
+        sameSite: 'none',
+        secure: true
+    }
 }));
 
 app.use(passport.initialize());
@@ -87,7 +91,7 @@ app.get('/auth/google/callback',
     passport.authenticate('google', {
         failureRedirect: '/login',
     }),
-    successReturnToOrRedirect('https://oz-movie-git-main-lee-sung-ils-projects.vercel.app')
+    successReturnToOrRedirect('https://oz-movie-chi.vercel.app')
 );
 
 // Kakao OAuth routes
@@ -97,7 +101,7 @@ app.get('/auth/kakao/callback',
     passport.authenticate('kakao', {
         failureRedirect: '/login',
     }),
-    successReturnToOrRedirect('https://oz-movie-git-main-lee-sung-ils-projects.vercel.app')
+    successReturnToOrRedirect('https://oz-movie-chi.vercel.app')
 );
 
 app.listen(PORT, () => {
