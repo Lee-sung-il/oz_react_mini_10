@@ -21,7 +21,7 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
 
   // Fetch current user on mount
   useEffect(() => {
-    api.get('/api/current-user', { credentials: 'include' })
+    api.get('api/current-user', { credentials: 'include' })
       .then(async (res) => {
         const data: { user: UserWithName } = await res.json();
         console.log('User loaded:', data.user);
@@ -43,7 +43,7 @@ export default function NavBar({ isDarkMode, toggleDarkMode }: { isDarkMode: boo
 
   const logout = async () => {
     try {
-      const response = await api.post('/api/logout');
+      const response = await api.post('api/logout');
       if (response.ok) {
         setUser(null);
         setShowDropdown(false);
