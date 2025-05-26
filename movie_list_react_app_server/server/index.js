@@ -18,8 +18,8 @@ mongoose.connect(DB_URL)
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://oz-movie-git-main-lee-sung-ils-projects.vercel.app',
-        'https://oz-movie-chi.vercel.app'
+        "oz-react-mini-movie.vercel.app",
+        "https://oz-react-mini-movie-git-main-lee-sung-ils-projects.vercel.app"
     ],
     credentials: true
 }));
@@ -29,7 +29,7 @@ app.use(session({
     secret: 'mySecretKey',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: DB_URL }),
+    store: MongoStore.create({mongoUrl: DB_URL}),
     cookie: {
         sameSite: 'none',
         secure: true
@@ -40,39 +40,39 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.post('/api/register', async (req, res) => {
-    const { name, email, password } = req.body;
-    const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: '이미 존재하는 사용자입니다.' });
+    const {name, email, password} = req.body;
+    const exists = await User.findOne({email});
+    if (exists) return res.status(400).json({message: '이미 존재하는 사용자입니다.'});
 
-    const user = new User({ name, email, password });
+    const user = new User({name, email, password});
     await user.save();
     req.login(user, (err) => {
-        if (err) return res.status(500).json({ message: '세션 오류' });
-        res.json({ message: '회원가입 성공' });
+        if (err) return res.status(500).json({message: '세션 오류'});
+        res.json({message: '회원가입 성공'});
     });
 });
 
 app.post('/api/login', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) return next(err);
-        if (!user) return res.status(401).json({ message: info.message });
+        if (!user) return res.status(401).json({message: info.message});
         req.login(user, (loginErr) => {
-            if (loginErr) return res.status(500).json({ message: '세션 로그인 실패' });
-            res.json({ message: '로그인 성공', user: { name: user.name, email: user.email } });
+            if (loginErr) return res.status(500).json({message: '세션 로그인 실패'});
+            res.json({message: '로그인 성공', user: {name: user.name, email: user.email}});
         });
     })(req, res, next);
 });
 
 app.get('/api/current-user', (req, res) => {
-    if (req.isAuthenticated()) res.json({ user: { name: req.user.name, email: req.user.email } });
-    else res.status(401).json({ message: '인증되지 않음' });
+    if (req.isAuthenticated()) res.json({user: {name: req.user.name, email: req.user.email}});
+    else res.status(401).json({message: '인증되지 않음'});
 });
 
 
 app.post('/api/logout', (req, res) => {
     req.logout((err) => {
-        if (err) return res.status(500).json({ message: '로그아웃 실패' });
-        res.json({ message: '로그아웃 성공' });
+        if (err) return res.status(500).json({message: '로그아웃 실패'});
+        res.json({message: '로그아웃 성공'});
     });
 });
 
@@ -80,7 +80,7 @@ app.post('/api/logout', (req, res) => {
 app.get('/auth/google', (req, res, next) => {
     req.session.returnTo = process.env.CLIENT_URL || 'http://localhost:5173';
     next();
-}, passport.authenticate('google', { scope: ['profile', 'email'] }));
+}, passport.authenticate('google', {scope: ['profile', 'email']}));
 
 function successReturnToOrRedirect(defaultRedirect) {
     return (req, res) => {
