@@ -91,7 +91,7 @@ app.get('/auth/google/callback',
     passport.authenticate('google', {
         failureRedirect: '/login',
     }),
-    successReturnToOrRedirect('https://oz-movie-chi.vercel.app')
+    successReturnToOrRedirect(process.env.CLIENT_URL || 'http://localhost:5173')
 );
 
 // Kakao OAuth routes
@@ -101,7 +101,7 @@ app.get('/auth/kakao/callback',
     passport.authenticate('kakao', {
         failureRedirect: '/login',
     }),
-    successReturnToOrRedirect('https://oz-movie-chi.vercel.app')
+    successReturnToOrRedirect(process.env.CLIENT_URL || 'http://localhost:5173')
 );
 
 app.listen(PORT, () => {
