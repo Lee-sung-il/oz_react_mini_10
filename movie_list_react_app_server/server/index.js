@@ -18,7 +18,7 @@ mongoose.connect(DB_URL)
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        "oz-react-mini-movie.vercel.app",
+        "https://movie-zoqx.vercel.app",
         "https://oz-react-mini-movie-git-main-lee-sung-ils-projects.vercel.app"
     ],
     credentials: true
